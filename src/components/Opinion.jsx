@@ -1,14 +1,19 @@
 import { OpinionsContext } from "../store/opinions-context";
-import { use, useActionState } from "react";
+import { use, useActionState, useOptimistic } from "react";
 export function Opinion({ opinion: { id, title, body, userName, votes } }) {
 
   const { upvoteOpinion, downvoteOpinion } = use(OpinionsContext) 
 
+  // è un hook che aiuta con updates ottimistici, sarà visto solo quando il form sarà submit, da una forma temporanea fino a che non viene completata l'api. 
+const [optimisticVotes, setVotesOptimistically] = useOptimistic(votes, (prevVotes, mode) => mode === 'up' ? prevVotes + 1 : prevVotes -1)
+
 async function upvoteAction (){
+  setVotesOptimistically('up')
  await upvoteOpinion(id);
 }
 
 async function downvoteAction (){
+  setVotesOptimistically('down')
   await downvoteOpinion(id);
 }
 
@@ -41,7 +46,7 @@ const [downvoteFormState, downvoteFormAction, downvotePending] = useActionState(
           </svg>
         </button>
 
-        <span>{votes}</span>
+        <span>{optimisticVotes}</span>
 
         <button
         formAction={downvoteFormAction}
