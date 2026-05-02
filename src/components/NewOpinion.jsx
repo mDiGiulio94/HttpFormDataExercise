@@ -1,12 +1,14 @@
 import { useActionState, use } from "react";
-import { OpinionsContext } from '../store/opinions-context';
+// non può essere usato all'interno del componente ma deve essere usato all'interno di un componente innestato
+import { useFormState } from "react-dom";
+import { OpinionsContext } from "../store/opinions-context";
+import Submit from "./Submit";
 export function NewOpinion() {
+  // use() permette di leggere direttamente il valore di una Promise o di un Context durante il render, lasciando a React la gestione dell'attesa
+  const { addOpinion } = use(OpinionsContext);
 
-// use() permette di leggere direttamente il valore di una Promise o di un Context durante il render, lasciando a React la gestione dell'attesa
- const { addOpinion } = use(OpinionsContext)
-
-//  le form action possono essere sia sincrone che asincrone, con asnincrone bisogna aspettare la risposta dal backend
- async function shareOpinionAction(prevState, formData) {
+  //  le form action possono essere sia sincrone che asincrone, con asnincrone bisogna aspettare la risposta dal backend
+  async function shareOpinionAction(prevState, formData) {
     const title = formData.get("title");
     const body = formData.get("body");
     const userName = formData.get("userName");
@@ -29,12 +31,13 @@ export function NewOpinion() {
       return { errors, enteredValues: { title, body, userName } };
     }
 
-    await addOpinion({title, body, userName});
-    return { errors: null}
+    await addOpinion({ title, body, userName });
+    return { errors: null };
   }
 
-    const [formState, formAction] = useActionState(shareOpinionAction, {errors: null});
-
+  const [formState, formAction] = useActionState(shareOpinionAction, {
+    errors: null,
+  });
 
   return (
     <div id="new-opinion">
@@ -64,9 +67,7 @@ export function NewOpinion() {
           </ul>
         )}
 
-        <p className="actions">
-          <button type="submit">Submit</button>
-        </p>
+        <Submit />
       </form>
     </div>
   );
