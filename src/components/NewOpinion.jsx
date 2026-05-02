@@ -1,8 +1,12 @@
-import { useActionState } from "react";
-
+import { useActionState, use } from "react";
+import { OpinionsContext } from '../store/opinions-context';
 export function NewOpinion() {
-  
-  function shareOpinionAction(prevState, formData) {
+
+// use() permette di leggere direttamente il valore di una Promise o di un Context durante il render, lasciando a React la gestione dell'attesa
+ const { addOpinion } = use(OpinionsContext)
+
+//  le form action possono essere sia sincrone che asincrone, con asnincrone bisogna aspettare la risposta dal backend
+ async function shareOpinionAction(prevState, formData) {
     const title = formData.get("title");
     const body = formData.get("body");
     const userName = formData.get("userName");
@@ -10,21 +14,22 @@ export function NewOpinion() {
     let errors = [];
 
     if (title.trim().length < 5) {
-      error.push("Title must be at least 5 characters");
+      errors.push("Title must be at least 5 characters");
     }
 
     if (body.trim().length < 20 || body.trim().length > 500) {
-      error.push("Your opinion must be between 20 and 500 characters");
+      errors.push("Your opinion must be between 20 and 500 characters");
     }
 
     if (!userName.trim()) {
-      error.push("Your name must be between 3 and 100 characters");
+      errors.push("Your name must be between 3 and 100 characters");
     }
 
-    if (error.length > 0) {
+    if (errors.length > 0) {
       return { errors, enteredValues: { title, body, userName } };
     }
 
+    await addOpinion({title, body, userName});
     return { errors: null}
   }
 
@@ -34,7 +39,7 @@ export function NewOpinion() {
   return (
     <div id="new-opinion">
       <h2>Share your opinion!</h2>
-      <form action={shareOpinionAction}>
+      <form action={formAction}>
         <div className="control-row">
           <p className="control">
             <label htmlFor="userName">Your Name</label>
