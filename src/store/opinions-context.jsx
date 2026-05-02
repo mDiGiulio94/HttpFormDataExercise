@@ -38,7 +38,7 @@ export function OpinionsContextProvider({ children }) {
   }
 
   async function upvoteOpinion(id) {
-    await fetch(`http://localhost:3000/opinions/${id}/upvote`, {
+   const response = await fetch(`http://localhost:3000/opinions/${id}/upvote`, {
       method: "POST",
     });
 
@@ -57,7 +57,7 @@ export function OpinionsContextProvider({ children }) {
   }
 
   async function downvoteOpinion(id) {
-    await fetch(`http://localhost:3000/opinions/${id}/downvote`, {
+   const response = await fetch(`http://localhost:3000/opinions/${id}/downvote`, {
       method: "POST",
     });
 
